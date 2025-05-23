@@ -6,6 +6,11 @@ const User = require("./models/user");
 const app = express();
 
 app.use(express.json());
+app.use(express.text({ type: "*/*" }));
+app.use((req, res, next) => {
+  console.log("Raw body:", req.body);
+  next();
+});
 
 // POST - signup user
 //runValidators - working on post/signup
@@ -17,6 +22,7 @@ app.post("/signup", async (req, res) => {
     res.status(200).send({
       satus: "success",
       message: "User Added successfully",
+      user: user
     });
   } catch (err) {
     res.status(400).send({
@@ -29,7 +35,7 @@ app.post("/signup", async (req, res) => {
 //GET - user by email
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
-  console.log(req.body.emailId);
+
   try {
     const user = await User.find({ emailId: userEmail });
 
@@ -128,79 +134,118 @@ app.get("/feeds", async (req, res) => {
 
 // PATCH - update user by ID
 //runValidators - working on update by ID
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
 
   try {
-  await User.findByIdAndUpdate({ _id: userId }, data, {
+
+    const ALLOWED_UPDATES = ["gender", "photoUrl", "about", "skills"];
+    const isUpdatesAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k),
+    );
+    if (!isUpdatesAllowed) {
+      throw new Error("Update not allowed");
+    }
+    if(data?.skills.length > 10){
+      throw new Error("Skills cannot be more than 10");
+    }
+
+    await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
-      new : true
+      new: true,
     });
 
-    if(!updatedUser){
-      return res.send("user not found")
-    }
     res.status(200).send({
       status: "success",
-      message: "User successfully updated",
+      message: "User updated successfully",
+    
     });
   } catch (err) {
-    console.log(err)
-    res.status(404).send("Something went wrong" + err.message);
+    console.log(err);
+    res.status(404).send("Something went wrong: " + err.message);
   }
 });
 
 // PATCH - Update user by emailId
 //runValidators - working on update by emailId
-app.patch("/user", async (req, res) =>{
-  const userEmail = req.body.emailId;
-  const updateData = {...req.body};
-  delete updateData._id;
-  delete updateData.emailId;
+// app.patch("/user/:emailId", async (req, res) => {
+//   const userEmail = req.params?.emailId;
+//   const data = req.body;
+//   console.log(data);
 
-  console.log(updateData)
+//   try {
+//     const user = await User.findOne({ emailId: userEmail });
+//     if (!user) {
+//       return res.status(404).send({
+//         status: "fail",
+//         message: "User not found with provided email",
+//       });
+//     }
 
-  try{
-   await User.findOneAndUpdate({emailId: userEmail}, updateData,{
-      new: true,
-      runValidators: true,
-    });
+//     const ALLOWED_UPDATES = [ "gender", "photoUrl", "about", "skills"];
+//     const isUpdatesAllowed = Object.keys(data).every((k) =>
+//       ALLOWED_UPDATES.includes(k),
+//     );
 
-    if (!updatedUser) {
-      return res.status(404).send({
-        status: "fail",
-        message: "User not found with provided email"
-      });
-    }
+//     if (!isUpdatesAllowed) {
+//       return res.status(404).send({
+//         status: "fail",
+//         message: "Invalid update field(s) detected",
+//       });
+//     }
 
-    res.status(200).send({
-      status: "success",
-      message: "User successfully updated",
-    })
-  }catch(err){
+//     const updatedUser = await User.findOneAndUpdate(
+//       userEmail,
+//       data,
+//       {
+//         new: true,
+//         runValidators: true,
+//       },
+//     );
 
-    res.send({
-      status: "error",
-      message: "Error updating user",
-      error: err.message,
-    });
-  }
-});
+//     res.status(200).send({
+//       status: "success",
+//       message: "User successfully updated",
+//       user: updatedUser,
+//     });
+//   } catch (err) {
+//     res.status(404).send({
+//       status: "fail",
+//       message: "Error updating user",
+//       error: err.message,
+//     });
+//   }
+// });
 
 // DELETE - user by ID
 app.delete("/user", async (req, res) => {
   const userId = req.body.userId;
 
   try {
-    const user = await User.findByIdAndDelete({ _id: userId });
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).send({
+        status: "fail",
+        message: "A valid userId must be provided",
+      });
+    }
+
+    const deletedUser = await User.findByIdAndDelete({ _id: userId });
+
+    if (!deletedUser) {
+      return res.status(404).send({
+        status: "fail",
+        message: "User not found or already deleted",
+      });
+    }
+
     res.status(200).send({
       status: "delete",
       message: "User deleted successfully",
     });
   } catch (err) {
-    res.status(404).send("Something went wrong");
+    res.status(404).send("Something went wrong: " + err.message);
   }
 });
 

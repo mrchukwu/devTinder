@@ -17,6 +17,7 @@
   "dependencies": {
     "devtinder": "file:",
     "express": "^5.1.0",
-    "mongoose": "^8.15.0"
+    "mongoose": "^8.15.0",
+    "validator": "^13.15.0"
   }
 }
