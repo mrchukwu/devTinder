@@ -1,7 +1,8 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
-// const user = require("./models/user");
+const {validateSignupData} = require("./utils/validation");
+
 
 const app = express();
 
@@ -15,10 +16,13 @@ app.use((req, res, next) => {
 // POST - signup user
 //runValidators - working on post/signup
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
 
   try {
+    validateSignupData(req);
+
+    const user = new User(req.body);
     await user.save();
+
     res.status(200).send({
       satus: "success",
       message: "User Added successfully",
@@ -27,7 +31,7 @@ app.post("/signup", async (req, res) => {
   } catch (err) {
     res.status(400).send({
       status: "fail",
-      message: "Error saving the user: " + err.message,
+      message: "ERROR : " + err.message,
     });
   }
 });
