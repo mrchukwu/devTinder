@@ -1,4 +1,6 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const {validateSignupData} = require("./utils/validation");
@@ -20,7 +22,12 @@ app.post("/signup", async (req, res) => {
   try {
     validateSignupData(req);
 
-    const user = new User(req.body);
+    const {firstName, lastName, emailId, password} = req.body;
+    const passwordHash = await bcrypt.hash(password, 10)
+
+    const user = new User({
+      firstName, lastName, emailId, password: passwordHash
+    });
     await user.save();
 
     res.status(200).send({
