@@ -17,9 +17,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       required: [true, "Email is required"],
-      validator: function (value) {
-        return value.includes('@');
-      },
+      match: [/\S+@\S+\.\S+/, 'Please provide a valid email address'],
       message: 'Email must contain "@" symbol',
       unique: true,
       trim: true,
