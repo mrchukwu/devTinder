@@ -13,6 +13,18 @@ const validateSignupData = (req) => {
     }
 }
 
-module.exports = {
-    validateSignupData
+
+const validateLoginData = (req) => {
+    const {emailId, password} = req.body;
+
+    if(!emailId){
+        throw new Error("Invalid credentials"); 
+    }else if(!password){
+        throw new Error("Invalid credentials")
+    }
 }
+
+module.exports = {
+    validateSignupData,
+    validateLoginData
+}   
