@@ -1,7 +1,6 @@
+
 const express = require("express");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const jwt =  require("jsonwebtoken");
 
 const connectDB = require("./config/database");
 const User = require("./models/user");
@@ -59,12 +58,12 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid credentials");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
     if(isPasswordValid){
       //create a jwt
-      const token = await jwt.sign({_id : user._id}, "DEV@Tinder$770")
+      const token = await user.getJWT();
       //cookie
-      res.cookie("token", token);
+      res.cookie("token", token, {expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)});
       
       res.status(200).send({
         status: "success",
@@ -93,6 +92,14 @@ app.get("/profile",userAuth, async (req, res) => {
   }catch(err){
     res.status(404).send("ERROR: " + err.message)
   }
+
+})
+
+app.post("/sendConnectionRequest",userAuth, async (req, res) => {
+  const user = req.user;
+  console.log("sending connection request.");
+
+  res.send(user.firstName + " sent a friend request")
 
 })
 
