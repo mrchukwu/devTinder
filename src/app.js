@@ -22,7 +22,6 @@ app.use((req, res, next) => {
 // POST - signup user
 //runValidators - working on post/signup
 app.post("/signup", async (req, res) => {
-
   try {
     validateSignupData(req);
 
