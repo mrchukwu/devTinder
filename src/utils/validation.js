@@ -70,7 +70,7 @@ const validatePasswordEdit = (req) => {
     // if(!oldPassword || typeof password !== "string" || password.trim() === "" || !newPassword || typeof newPassword !== "string" || newPassword.trim() === "" && !validator.isStrongPassword(newPassword)){
     //     throw new Error("Invalid credentials")
     // }
-    if(!oldPassword || !newPassword){
+    if(!oldPassword || !newPassword ){
         throw new Error("Invalid credentials")
     }
 }

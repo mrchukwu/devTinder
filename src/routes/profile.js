@@ -42,7 +42,7 @@ profileRouter.patch("/profile/edit", userAuth, async(req, res) =>{
     }
 })
 
-profileRouter.patch("/profile/passwordUpdate", userAuth, async(req, res) => {
+profileRouter.patch("/profile/forgotpassword", userAuth, async(req, res) => {
   try{
 
     validatePasswordEdit(req);
