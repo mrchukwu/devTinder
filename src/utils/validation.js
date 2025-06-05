@@ -65,9 +65,12 @@ const validateProfileEditData = (req) => {
 }
 
 const validatePasswordEdit = (req) => {
-    const {password} = req.body;
+    const {oldPassword, newPassword} = req.body;
 
-    if(!password || typeof password!== "string" || password.trim() === ""){
+    // if(!oldPassword || typeof password !== "string" || password.trim() === "" || !newPassword || typeof newPassword !== "string" || newPassword.trim() === "" && !validator.isStrongPassword(newPassword)){
+    //     throw new Error("Invalid credentials")
+    // }
+    if(!oldPassword || !newPassword){
         throw new Error("Invalid credentials")
     }
 }
