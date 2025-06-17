@@ -8,7 +8,8 @@ const User = require("../models/user");
         const {token} = req.cookies;
 
         if(!token){
-            throw new Error("Invalid token!")
+            return res.status(401).send("Please login!")
+            // throw new Error("Invalid token!")
         }
         const decodedObj = await jwt.verify(token, "DEV@Tinder$770");
 

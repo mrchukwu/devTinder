@@ -10,12 +10,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       minLength: 4,
       MaxLength: 50,
-      trim: true
+      trim: true,
     },
     lastName: {
       type: String,
       MaxLength: 50,
-      trim: true
+      trim: true,
+    
     },
 
     emailId: {
@@ -54,7 +55,7 @@ const userSchema = new mongoose.Schema(
       validate(value){
         return value >= 18;
       },
-      message: "User must be at least 18 years old."
+      message: "User must be at least 18 years old.",
     },
 
     gender: {
@@ -64,7 +65,7 @@ const userSchema = new mongoose.Schema(
       enum: {
         values: ["male", "female", "other"],
         message: `{VALUE} is not a valid gender`
-      }
+      },
       // validate(value) { 
       //   if (!["male", "female", "other"].includes(value)) {
       //     throw new Error("Gender data is not valid");
@@ -75,7 +76,7 @@ const userSchema = new mongoose.Schema(
     photoUrl: {
       type: String,
       default:
-        "https://www.freepik.com/premium-vector/man-professional-business-casual-young-avatar-icon-illustration_270519234.htm",
+        "https://geographyandyou.com/images/user-profile.png",
         validate(value){
           if(!validator.isURL(value)){
             throw new Error("Invalid photo URL")
